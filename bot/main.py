@@ -1,19 +1,18 @@
-import asyncio
+from aiogram import executor
+from bot.handlers import dp
+from bot.utils.notify_admins import on_startup_notify
+from bot.utils.set_bot_commands import set_default_commands
 
-from config import DATABASE_URL
-from models.config import db
-from models.user import User
 
-
-async def bot_task():
-    await db.set_bind(DATABASE_URL)
-    while 1:
-        usr = await User.create(nickname='usr_1')
-        print('1: ', usr)
-        await asyncio.sleep(2)
+async def on_startup(dispatcher):
+    await set_default_commands(dispatcher)
+    await on_startup_notify(dispatcher)
+    # TODO logging
 
 
 def init_bot():
-    # TODO get event loop and run bot task
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(bot_task())
+    executor.start_polling(dp, on_startup=on_startup)
+
+
+if __name__ == '__main__':
+    init_bot()
