@@ -16,4 +16,4 @@ async def daemon_task():
 def init_daemon():
     # TODO get event loop and run demon task
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(daemon_task())
+    # loop.run_until_complete(daemon_task())
