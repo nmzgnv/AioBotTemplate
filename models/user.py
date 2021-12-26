@@ -5,7 +5,7 @@ from sqlalchemy import String, Column, Integer
 class User(db.Model):
     __tablename__ = 'users'
 
-    pk = Column(db.String(), primary_key=True, unique=True)
+    pk = Column(db.Integer(), primary_key=True)
 
     telegram_id = Column(Integer())
     nickname = Column(String(length=33), default='-')

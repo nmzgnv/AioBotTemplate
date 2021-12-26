@@ -46,6 +46,8 @@ def init_server() -> Sanic:
 
 
 if __name__ == '__main__':
+    from bot.text_utils import _
+
     loop = asyncio.get_event_loop()
     loop.run_until_complete(init_db())
     # TODO asyncio run checkpoints
