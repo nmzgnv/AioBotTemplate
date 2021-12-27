@@ -4,13 +4,14 @@ import os
 
 from gino_admin import add_admin_panel
 from sanic import Sanic, response
-
+from loguru import logger
 from bot.main import init_bot
 from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL
 from daemon.main import init_daemon
 from models import Chat, User, Text, db
 
 app = Sanic(name=__name__)
+logger.add("data.log", format='{time} {level} {message}', level="INFO", rotation="10 MB", compression="zip")
 
 
 @app.route("/")
@@ -46,8 +47,6 @@ def init_server() -> Sanic:
 
 
 if __name__ == '__main__':
-    from bot.text_utils import _
-
     loop = asyncio.get_event_loop()
     loop.run_until_complete(init_db())
     # TODO asyncio run checkpoints
@@ -62,4 +61,5 @@ if __name__ == '__main__':
     daemon.start()
 
     app = init_server()
+    logger.info("App has been initialized")
     app.run(host="127.0.0.1", port=os.getenv("PORT", 8000), debug=False, auto_reload=False)

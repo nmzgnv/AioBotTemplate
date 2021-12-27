@@ -1,5 +1,7 @@
 import asyncio
 
+from loguru import logger
+
 from config import DATABASE_URL
 from models.config import db
 from models.user import User
@@ -14,6 +16,6 @@ async def daemon_task():
 
 
 def init_daemon():
-    # TODO get event loop and run demon task
     loop = asyncio.get_event_loop()
+    logger.info("Daemon has been initialized")
     # loop.run_until_complete(daemon_task())

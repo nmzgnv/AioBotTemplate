@@ -1,4 +1,5 @@
 from aiogram import Dispatcher
+from loguru import logger
 
 from config import ADMINS
 
@@ -8,6 +9,5 @@ async def on_startup_notify(dp: Dispatcher):
         try:
             await dp.bot.send_message(admin, "Bot was started")
 
-        except Exception as err:
-            # TODO logging
-            pass
+        except Exception as e:
+            logger.error(f"Notify admin ({admin}) error: {e}")
