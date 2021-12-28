@@ -7,7 +7,5 @@ from models import User
 
 @dp.message_handler(CommandStart(), state='*')
 async def bot_start(message: types.Message):
-    # TODO register user
-    await User.create(telegram_id=str(message.from_user.id), username=message.from_user.username)
-    #
+    await User.create_or_update_from_message(message)
     await message.answer(_('start_text'))

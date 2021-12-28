@@ -6,9 +6,9 @@ from gino_admin import add_admin_panel
 from sanic import Sanic, response
 from loguru import logger
 from bot.main import init_bot
-from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL
+from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST
 from daemon.main import init_daemon
-from models import Chat, User, Text, db
+from models import User, Text, db
 
 app = Sanic(name=__name__)
 logger.add("data.log", format='{time} {level} {message}', level="INFO", rotation="10 MB", compression="zip")
@@ -27,8 +27,7 @@ async def init_db():
 
 
 def init_server() -> Sanic:
-    # TODO configure normally
-    app.config["DB_HOST"] = os.getenv("DB_HOST", "localhost")
+    app.config["DB_HOST"] = DB_HOST
     app.config["DB_DATABASE"] = DB_NAME
     app.config["DB_USER"] = DB_USER
     app.config["DB_PASSWORD"] = DB_PASSWORD
@@ -41,7 +40,7 @@ def init_server() -> Sanic:
         name='Bot admin',
         app=app,
         db=db,
-        db_models=[User, Chat, Text],
+        db_models=[User, Text],
     )
     return app
 
