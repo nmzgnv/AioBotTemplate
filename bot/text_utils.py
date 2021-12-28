@@ -47,7 +47,6 @@ async def fill_db_texts_if_need(cached_texts: dict) -> bool:
     await Text.__table__.gino.create()
 
     for language, texts in cached_texts.items():
-        print('language', language, 'text', texts)
         for name, value in texts.items():
             await Text(name=name, value=value, language=language).create()
 
