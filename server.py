@@ -6,12 +6,16 @@ from gino_admin import add_admin_panel
 from sanic import Sanic, response, html
 from loguru import logger
 from bot.main import init_bot
-from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST
+from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST, BOT_TOKEN
 from daemon.main import init_daemon
 from models import User, Text, db
+from sanic_jinja2 import SanicJinja2
 
 app = Sanic(name=__name__)
+jinja = SanicJinja2(app, pkg_name="server")
 logger.add("data.log", format='{time} {level} {message}', level="INFO", rotation="10 MB", compression="zip")
+
+telegram_bot = multiprocessing.Process(target=init_bot)
 
 
 @app.route("/")
@@ -19,10 +23,70 @@ async def index(request):
     return response.redirect("/admin")
 
 
-@app.route("/bot")
+@app.route("/bot-settings")
 def bot_settings(request):
-    template = open(os.getcwd() + "/templates/bot_settings.html")
-    return html(template.read())
+    token = os.getenv('BOT_TOKEN')
+    return jinja.render("bot_settings.html", request, token=token)
+
+
+def generate_response_message(is_success, message):
+    return {'success': is_success, 'message': message}
+
+
+@app.route("/api/bot/stop")
+def stop_bot_handle(request):
+    if telegram_bot.is_alive():
+        stop_bot_process()
+        response_data = generate_response_message(True, 'Bot was turned off')
+    else:
+        response_data = generate_response_message(False, 'Bot already turned off')
+
+    return response.json(response_data)
+
+
+@app.route("/api/bot/start")
+def start_bot_handle(request):
+    if not telegram_bot.is_alive():
+        start_new_bot_process()
+        response_data = generate_response_message(True, 'Bot was turned on')
+    else:
+        response_data = generate_response_message(False, 'Bot already work')
+
+    return response.json(response_data)
+
+
+@app.route("/api/bot/change-token", methods=['PUT', ])
+def start_bot_handle(request):
+    data = request.json
+
+    if 'token' in data:
+        new_token = data['token']
+        os.environ['BOT_TOKEN'] = new_token
+        restart_bot_process()
+        response_data = generate_response_message(True, 'Bot token was updated. Bot restarted.')
+    else:
+        response_data = generate_response_message(False, 'Invalid request body')
+
+    return response.json(response_data)
+
+
+def stop_bot_process():
+    global telegram_bot
+    telegram_bot.terminate()
+    telegram_bot.kill()
+    logger.info("Bot was turned off")
+
+
+def start_new_bot_process():
+    global telegram_bot
+    telegram_bot = multiprocessing.Process(target=init_bot)
+    telegram_bot.start()
+    logger.info("Bot process was started")
+
+
+def restart_bot_process():
+    stop_bot_process()
+    start_new_bot_process()
 
 
 async def init_db():
@@ -59,12 +123,9 @@ if __name__ == '__main__':
     # 1) Token exist
     # 2) Tables exist
 
-    # WARNING each process should connect to database
     daemon = multiprocessing.Process(target=init_daemon)
-    bot = multiprocessing.Process(target=init_bot)
-
-    bot.start()
     daemon.start()
+    telegram_bot.start()
 
     app = init_server()
     logger.info("App has been initialized")

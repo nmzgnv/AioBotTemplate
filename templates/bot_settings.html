@@ -12,7 +12,7 @@
 <div class="container-fluid" style="padding-top: 20px;">
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="admin">Bot settings</a>
+            <a class="nav-link active" aria-current="page" href="#">Bot settings</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" aria-current="page" href="admin">To admin</a>
@@ -30,6 +30,7 @@
          ">
         <input type="text" class="form-control" placeholder="Bot token" aria-label="Bot token"
                aria-describedby="basic-addon1"
+               value="{{ token }}"
                style="max-width:400px; min-width:100px;" id="tokenInputField">
         <button type="button" class="btn btn-primary" id="changeTokenButton">Change token</button>
     </div>
@@ -39,7 +40,6 @@
         <button type="button" class="btn btn-primary" id="restartBotButton">Restart bot</button>
     </div>
 </div>
-
 
 </body>
 </html>
