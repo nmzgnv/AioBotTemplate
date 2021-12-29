@@ -3,7 +3,7 @@ import multiprocessing
 import os
 
 from gino_admin import add_admin_panel
-from sanic import Sanic, response
+from sanic import Sanic, response, html
 from loguru import logger
 from bot.main import init_bot
 from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST
@@ -17,6 +17,12 @@ logger.add("data.log", format='{time} {level} {message}', level="INFO", rotation
 @app.route("/")
 async def index(request):
     return response.redirect("/admin")
+
+
+@app.route("/bot")
+def bot_settings(request):
+    template = open(os.getcwd() + "/templates/bot_settings.html")
+    return html(template.read())
 
 
 async def init_db():
@@ -41,6 +47,7 @@ def init_server() -> Sanic:
         app=app,
         db=db,
         db_models=[User, Text],
+        hide_columns=['pk', 'id']
     )
     return app
 

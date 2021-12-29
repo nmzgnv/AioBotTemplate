@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container-fluid" style="padding-top: 20px;">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="admin">Bot settings</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="admin">To admin</a>
+        </li>
+    </ul>
+    <hr/>
+
+    <div class="input-group mb-3"
+         style="
+            display: flex;
+            flex-direction: row;
+            flex-flow: wrap;
+            margin-top: 40px;
+            margin-left: 10px;
+         ">
+        <input type="text" class="form-control" placeholder="Bot token" aria-label="Bot token"
+               aria-describedby="basic-addon1"
+               style="max-width:400px; min-width:100px;" id="tokenInputField">
+        <button type="button" class="btn btn-primary" id="changeTokenButton">Change token</button>
+    </div>
+
+    <div class="container-fluid">
+        <button type="button" class="btn btn-danger" id="stopBotButton">Stop bot</button>
+        <button type="button" class="btn btn-primary" id="restartBotButton">Restart bot</button>
+    </div>
+</div>
+
+
+</body>
+</html>
