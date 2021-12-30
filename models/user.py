@@ -38,14 +38,16 @@ class User(db.Model):
             if saved_user.username != username:
                 logger.info(f"User {str_tg_id} changed username @{saved_user.username} to @{username}")
                 await saved_user.update(username=username).apply()
-            return
+            return saved_user
 
         referer_id = None
         command_args = message.get_args()
-        if len(command_args) > 0:
+        if command_args:
             referer = await User.query.where(User.telegram_id == command_args.strip()).gino.first()
             if referer:
                 referer_id = referer.telegram_id
 
-        await User.create(telegram_id=str_tg_id, username=username, referer_id=referer_id)
+        user = await User.create(telegram_id=str_tg_id, username=username, referer_id=referer_id)
         logger.info(f"User {str_tg_id} (@{username}) registered with referer: {referer_id}")
+
+        return user

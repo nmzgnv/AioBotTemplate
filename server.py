@@ -118,9 +118,6 @@ def init_server() -> Sanic:
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(init_db())
-    # TODO asyncio run checkpoints
-    # 1) Token exist
-    # 2) Tables exist
 
     daemon = multiprocessing.Process(target=init_daemon)
     daemon.start()
