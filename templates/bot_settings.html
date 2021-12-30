@@ -41,5 +41,41 @@
     </div>
 </div>
 
+<script>
+    const sureText = "Are you sure?";
+
+    const sendRequestIfConfirmed = (fetchFunc) => {
+        if (window.confirm(sureText)) {
+            fetchFunc();
+        }
+    }
+
+    $("#changeTokenButton").click(() => {
+        fetch('/api/bot/change-token', {
+            method: 'POST',
+            body: JSON.stringify({
+                token: $('#tokenInputField').val()
+            })
+        }).then(response => response.json())
+            .then(json => alert(json.message))
+    });
+
+    $("#stopBotButton").click(() => {
+        sendRequestIfConfirmed(() =>
+            fetch("/api/bot/stop")
+                .then(response => response.json())
+                .then(json => alert(json.message))
+        );
+    });
+
+    $("#restartBotButton").click(() => {
+        sendRequestIfConfirmed(() =>
+            fetch("/api/bot/restart")
+                .then(response => response.json())
+                .then(json => alert(json.message))
+        );
+    });
+</script>
+
 </body>
 </html>

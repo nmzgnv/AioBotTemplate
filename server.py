@@ -3,10 +3,10 @@ import multiprocessing
 import os
 
 from gino_admin import add_admin_panel
-from sanic import Sanic, response, html
+from sanic import Sanic, response
 from loguru import logger
 from bot.main import init_bot
-from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST, BOT_TOKEN
+from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST
 from daemon.main import init_daemon
 from models import User, Text, db
 from sanic_jinja2 import SanicJinja2
@@ -21,6 +21,10 @@ telegram_bot = multiprocessing.Process(target=init_bot)
 @app.route("/")
 async def index(request):
     return response.redirect("/admin")
+
+
+async def redirect_to_bot_settings(request):
+    return response.redirect("/bot-settings")
 
 
 @app.route("/bot-settings")
@@ -44,18 +48,13 @@ def stop_bot_handle(request):
     return response.json(response_data)
 
 
-@app.route("/api/bot/start")
+@app.route("/api/bot/restart")
 def start_bot_handle(request):
-    if not telegram_bot.is_alive():
-        start_new_bot_process()
-        response_data = generate_response_message(True, 'Bot was turned on')
-    else:
-        response_data = generate_response_message(False, 'Bot already work')
-
-    return response.json(response_data)
+    restart_bot_process()
+    return response.json(generate_response_message(True, 'Bot was restarted'))
 
 
-@app.route("/api/bot/change-token", methods=['PUT', ])
+@app.route("/api/bot/change-token", methods=['POST', 'PUT'])
 def start_bot_handle(request):
     data = request.json
 
@@ -128,5 +127,11 @@ if __name__ == '__main__':
     telegram_bot.start()
 
     app = init_server()
+    # Override gino admin link to be able to redirect to my custom page
+    for route in app.router.routes:
+        if route.path == 'admin/settings':
+            route.handler = redirect_to_bot_settings
+            break
+
     logger.info("App has been initialized")
     app.run(host="127.0.0.1", port=os.getenv("PORT", 8000), debug=False, auto_reload=False)
