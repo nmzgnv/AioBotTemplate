@@ -2,11 +2,12 @@ import asyncio
 import multiprocessing
 import os
 
+import dsnparse
 from gino_admin import add_admin_panel
 from sanic import Sanic, response
 from loguru import logger
 from bot.main import init_bot
-from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST
+from config import DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL, DB_HOST, ADMIN_PASSWORD, ADMIN_USER, ADMIN_AUTH_DISABLE
 from daemon.main import init_daemon
 from models import User, Text, db
 from sanic_jinja2 import SanicJinja2
@@ -96,21 +97,22 @@ async def init_db():
 
 
 def init_server() -> Sanic:
-    app.config["DB_HOST"] = DB_HOST
-    app.config["DB_DATABASE"] = DB_NAME
-    app.config["DB_USER"] = DB_USER
-    app.config["DB_PASSWORD"] = DB_PASSWORD
+    db_config = dsnparse.parse(DATABASE_URL)
+    app.config["DB_DATABASE"] = db_config.database
+    app.config["DB_USER"] = db_config.user
+    app.config["DB_PASSWORD"] = db_config.password
+    app.config["DB_HOST"] = db_config.host
 
-    # app.config["ADMIN_USER"] = "admin"
-    # app.config["ADMIN_PASSWORD"] = "admin"
-    os.environ['ADMIN_AUTH_DISABLE'] = '1'
+    app.config["ADMIN_USER"] = ADMIN_USER
+    app.config["ADMIN_PASSWORD"] = ADMIN_PASSWORD
+    os.environ['ADMIN_AUTH_DISABLE'] = ADMIN_AUTH_DISABLE
 
     add_admin_panel(
         name='Bot admin',
         app=app,
         db=db,
         db_models=[User, Text],
-        hide_columns=['pk', 'id']
+        hide_columns=['pk', 'id', User.state, User.state_data, User.telegram_id]
     )
     return app
 

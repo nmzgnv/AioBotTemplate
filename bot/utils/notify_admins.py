@@ -1,11 +1,11 @@
 from aiogram import Dispatcher
 from loguru import logger
 
-from config import ADMINS
+from config import ADMIN_TG_IDS
 
 
 async def on_startup_notify(dp: Dispatcher):
-    for admin in ADMINS:
+    for admin in ADMIN_TG_IDS:
         try:
             await dp.bot.send_message(admin, "Bot was started")
 
